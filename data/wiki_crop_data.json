@@ -1,0 +1,413 @@
+{
+  "source": {
+    "name": "Captain of Industry Wiki / game recipe snapshot",
+    "base_url": "https://wiki.coigame.com/",
+    "notes": [
+      "This file stores crop data in a structured form suitable for the simulator.",
+      "Tier-specific water and organic fertilizer values were aligned to the FarmT2/FarmT3/FarmT4 crop recipe rows.",
+      "Greenhouse-only crops leave non-applicable farm tiers as null."
+    ],
+    "general_farming_page": {
+      "url": "https://wiki.coigame.com/Farming",
+      "notes": [
+        "Yields scale linearly with fertility.",
+        "Natural fertility replenishes below 100% at 0.6% of missing fertility per day.",
+        "The wiki formula uses crop fertility consumption F_C in % per 60 days."
+      ]
+    }
+  },
+  "crops_used_by_simulator": [
+    {
+      "name": "Green Manure",
+      "wiki_title": "Green Manure",
+      "wiki_url": "https://wiki.coigame.com/Green_Manure",
+      "kind": "non-food",
+      "type": "Seed",
+      "state": "Virtual",
+      "created_in": ["Farm", "Irrigated Farm", "Greenhouse", "Greenhouse II"],
+      "used_in": ["Farm", "Irrigated Farm", "Greenhouse", "Greenhouse II"],
+      "duration_days": 180,
+      "base_output_per_cycle": null,
+      "base_output_per_60_days": null,
+      "loader_overrides": {
+        "base_output_per_cycle": 0,
+        "yield_per_farm": {
+          "FarmT1": 0,
+          "FarmT2": 0,
+          "FarmT3": 0,
+          "FarmT4": 0
+        },
+        "water_per_farm": {
+          "FarmT1": 0.900390625,
+          "FarmT2": 0.900390625,
+          "FarmT3": 0.900390625,
+          "FarmT4": 0.900390625
+        },
+        "fertility_per_farm": {
+          "FarmT1": -120,
+          "FarmT2": -120,
+          "FarmT3": -150,
+          "FarmT4": -180
+        },
+        "requires_greenhouse": false
+      },
+      "tiers": {
+        "FarmT2": {
+          "water_per_cycle": null,
+          "water_per_month": null,
+          "organic_fertilizer_per_cycle": null,
+          "organic_fertilizer_per_month": null
+        },
+        "FarmT3": {
+          "water_per_cycle": null,
+          "water_per_month": null,
+          "organic_fertilizer_per_cycle": null,
+          "organic_fertilizer_per_month": null
+        },
+        "FarmT4": {
+          "water_per_cycle": null,
+          "water_per_month": null,
+          "organic_fertilizer_per_cycle": null,
+          "organic_fertilizer_per_month": null
+        }
+      },
+      "notes": [
+        "Produces no food.",
+        "Wiki text says it increases soil fertility and yield of rotated crops."
+      ]
+    },
+    {
+      "name": "Potatoes",
+      "wiki_title": "Potato",
+      "wiki_url": "https://wiki.coigame.com/Potato",
+      "kind": "food",
+      "type": "Crafted material",
+      "state": "Loose",
+      "created_in": ["Farm", "Irrigated Farm", "Greenhouse", "Greenhouse II"],
+      "used_in": [],
+      "duration_days": 180,
+      "base_output_per_cycle": 58,
+      "base_output_per_60_days": 19.33,
+      "tiers": {
+        "FarmT2": {
+          "water_per_cycle": 108.0176,
+          "water_per_month": 36.00586666666667,
+          "organic_fertilizer_per_cycle": 31.50195,
+          "organic_fertilizer_per_month": 10.50065
+        },
+        "FarmT3": {
+          "water_per_cycle": 121.5527,
+          "water_per_month": 40.517566666666666,
+          "organic_fertilizer_per_cycle": 35.43945,
+          "organic_fertilizer_per_month": 11.81315
+        },
+        "FarmT4": {
+          "water_per_cycle": 135.0,
+          "water_per_month": 45.0,
+          "organic_fertilizer_per_cycle": 39.37793,
+          "organic_fertilizer_per_month": 13.12598
+        }
+      }
+    },
+    {
+      "name": "Corn",
+      "wiki_title": "Corn",
+      "wiki_url": "https://wiki.coigame.com/Corn",
+      "kind": "food",
+      "type": "Crafted material",
+      "state": "Loose",
+      "created_in": ["Farm", "Irrigated Farm", "Greenhouse", "Greenhouse II"],
+      "used_in": [],
+      "duration_days": 240,
+      "base_output_per_cycle": 66,
+      "base_output_per_60_days": 16.5,
+      "tiers": {
+        "FarmT2": {
+          "water_per_cycle": 159.6094,
+          "water_per_month": 39.90235,
+          "organic_fertilizer_per_cycle": 48.0,
+          "organic_fertilizer_per_month": 12.0
+        },
+        "FarmT3": {
+          "water_per_cycle": 179.5313,
+          "water_per_month": 44.882825,
+          "organic_fertilizer_per_cycle": 54.0,
+          "organic_fertilizer_per_month": 13.5
+        },
+        "FarmT4": {
+          "water_per_cycle": 199.5703,
+          "water_per_month": 49.892575,
+          "organic_fertilizer_per_cycle": 60.0,
+          "organic_fertilizer_per_month": 15.0
+        }
+      }
+    },
+    {
+      "name": "Wheat",
+      "wiki_title": "Wheat",
+      "wiki_url": "https://wiki.coigame.com/Wheat",
+      "kind": "food",
+      "type": "Raw farming product",
+      "state": "Loose",
+      "created_in": ["Farm", "Irrigated Farm", "Greenhouse", "Greenhouse II"],
+      "used_in": [],
+      "duration_days": 360,
+      "base_output_per_cycle": 58,
+      "base_output_per_60_days": 9.67,
+      "tiers": {
+        "FarmT2": {
+          "water_per_cycle": 190.7227,
+          "water_per_month": 31.787116666666668,
+          "organic_fertilizer_per_cycle": 63.00391,
+          "organic_fertilizer_per_month": 10.500651666666666
+        },
+        "FarmT3": {
+          "water_per_cycle": 214.6289,
+          "water_per_month": 35.77148333333333,
+          "organic_fertilizer_per_cycle": 70.87988,
+          "organic_fertilizer_per_month": 11.813313333333334
+        },
+        "FarmT4": {
+          "water_per_cycle": 238.3594,
+          "water_per_month": 39.72656666666667,
+          "organic_fertilizer_per_cycle": 78.75488,
+          "organic_fertilizer_per_month": 13.125813333333334
+        }
+      }
+    },
+    {
+      "name": "Vegetables",
+      "wiki_title": "Vegetables",
+      "wiki_url": "https://wiki.coigame.com/Vegetables",
+      "kind": "food",
+      "type": "Crafted material",
+      "state": "Unit",
+      "created_in": ["Farm", "Irrigated Farm", "Greenhouse", "Greenhouse II"],
+      "used_in": [],
+      "duration_days": 240,
+      "base_output_per_cycle": 60,
+      "base_output_per_60_days": 15,
+      "tiers": {
+        "FarmT2": {
+          "water_per_cycle": 128.4375,
+          "water_per_month": 32.109375,
+          "organic_fertilizer_per_cycle": 42.00293,
+          "organic_fertilizer_per_month": 10.5007325
+        },
+        "FarmT3": {
+          "water_per_cycle": 144.4922,
+          "water_per_month": 36.12305,
+          "organic_fertilizer_per_cycle": 47.25293,
+          "organic_fertilizer_per_month": 11.8132325
+        },
+        "FarmT4": {
+          "water_per_cycle": 160.5469,
+          "water_per_month": 40.136725,
+          "organic_fertilizer_per_cycle": 52.50391,
+          "organic_fertilizer_per_month": 13.1259775
+        }
+      }
+    },
+    {
+      "name": "Soybean",
+      "wiki_title": "Soybean",
+      "wiki_url": "https://wiki.coigame.com/Soybean",
+      "kind": "food-and-industrial",
+      "type": "Crafted material",
+      "state": "Loose",
+      "created_in": ["Farm", "Irrigated Farm", "Greenhouse", "Greenhouse II"],
+      "used_in": [],
+      "duration_days": 240,
+      "base_output_per_cycle": 22,
+      "base_output_per_60_days": 5.5,
+      "tiers": {
+        "FarmT2": {
+          "water_per_cycle": 144.0234,
+          "water_per_month": 36.00585,
+          "organic_fertilizer_per_cycle": 59.99414,
+          "organic_fertilizer_per_month": 14.998535
+        },
+        "FarmT3": {
+          "water_per_cycle": 162.0703,
+          "water_per_month": 40.517575,
+          "organic_fertilizer_per_cycle": 67.49316,
+          "organic_fertilizer_per_month": 16.87329
+        },
+        "FarmT4": {
+          "water_per_cycle": 180.0,
+          "water_per_month": 45.0,
+          "organic_fertilizer_per_cycle": 74.99316,
+          "organic_fertilizer_per_month": 18.74829
+        }
+      }
+    },
+    {
+      "name": "Sugar Cane",
+      "wiki_title": "Sugar Cane",
+      "wiki_url": "https://wiki.coigame.com/Sugar_Cane",
+      "kind": "industrial-food-chain",
+      "type": "Crafted material",
+      "state": "Loose",
+      "created_in": ["Greenhouse", "Greenhouse II"],
+      "used_in": [],
+      "duration_days": 540,
+      "base_output_per_cycle_tier_i": 248,
+      "base_output_per_cycle_tier_ii": 297,
+      "tiers": {
+        "FarmT2": {
+          "water_per_cycle": null,
+          "water_per_month": null,
+          "organic_fertilizer_per_cycle": null,
+          "organic_fertilizer_per_month": null
+        },
+        "FarmT3": {
+          "water_per_cycle": 485.9473,
+          "water_per_month": 53.994144444444446,
+          "organic_fertilizer_per_cycle": 151.8604,
+          "organic_fertilizer_per_month": 16.873377777777776
+        },
+        "FarmT4": {
+          "water_per_cycle": 540.0,
+          "water_per_month": 60.0,
+          "organic_fertilizer_per_cycle": 168.7344,
+          "organic_fertilizer_per_month": 18.748266666666665
+        }
+      }
+    },
+    {
+      "name": "Saplings",
+      "wiki_title": "Tree Sapling",
+      "wiki_url": "https://wiki.coigame.com/Tree_Sapling",
+      "kind": "non-food",
+      "type": "Unit product",
+      "state": "Unit",
+      "created_in": ["Farm", "Irrigated Farm", "Greenhouse", "Greenhouse II"],
+      "used_in": ["Tree Planter"],
+      "duration_days": 720,
+      "base_output_per_cycle": 60,
+      "base_output_per_60_days": 5,
+      "tiers": {
+        "FarmT2": {
+          "water_per_cycle": 324.1406,
+          "water_per_month": 27.01171666666667,
+          "organic_fertilizer_per_cycle": 72.0,
+          "organic_fertilizer_per_month": 6.0
+        },
+        "FarmT3": {
+          "water_per_cycle": 364.5703,
+          "water_per_month": 30.38085833333333,
+          "organic_fertilizer_per_cycle": 81.0,
+          "organic_fertilizer_per_month": 6.75
+        },
+        "FarmT4": {
+          "water_per_cycle": 405.3516,
+          "water_per_month": 33.7793,
+          "organic_fertilizer_per_cycle": 90.0,
+          "organic_fertilizer_per_month": 7.5
+        }
+      }
+    },
+    {
+      "name": "Fruit",
+      "wiki_title": "Fruit",
+      "wiki_url": "https://wiki.coigame.com/Fruit",
+      "kind": "food",
+      "type": "Crafted material",
+      "state": "Unit",
+      "created_in": ["Greenhouse", "Greenhouse II"],
+      "used_in": [],
+      "duration_days": 480,
+      "base_output_per_cycle_tier_i": 100,
+      "base_output_per_cycle_tier_ii": 120,
+      "tiers": {
+        "FarmT2": {
+          "water_per_cycle": null,
+          "water_per_month": null,
+          "organic_fertilizer_per_cycle": null,
+          "organic_fertilizer_per_month": null
+        },
+        "FarmT3": {
+          "water_per_cycle": 359,
+          "water_per_month": 44.88,
+          "organic_fertilizer_per_cycle": 81,
+          "organic_fertilizer_per_month": 10.13
+        },
+        "FarmT4": {
+          "water_per_cycle": 399,
+          "water_per_month": 49.88,
+          "organic_fertilizer_per_cycle": 90,
+          "organic_fertilizer_per_month": 11.25
+        }
+      },
+      "notes": [
+        "Fruit is greenhouse-only in this snapshot."
+      ]
+    },
+    {
+      "name": "Canola",
+      "wiki_title": "Canola",
+      "wiki_url": "https://wiki.coigame.com/Canola",
+      "kind": "industrial-food-chain",
+      "type": "Crafted material",
+      "state": "Loose",
+      "created_in": ["Farm", "Irrigated Farm", "Greenhouse", "Greenhouse II"],
+      "used_in": [],
+      "duration_days": 180,
+      "base_output_per_cycle": 36,
+      "base_output_per_60_days": 12,
+      "tiers": {
+        "FarmT2": {
+          "water_per_cycle": 83.67188,
+          "water_per_month": 27.890626666666666,
+          "organic_fertilizer_per_cycle": 26.99609,
+          "organic_fertilizer_per_month": 8.998696666666667
+        },
+        "FarmT3": {
+          "water_per_cycle": 94.13086,
+          "water_per_month": 31.376953333333333,
+          "organic_fertilizer_per_cycle": 30.37012,
+          "organic_fertilizer_per_month": 10.123373333333334
+        },
+        "FarmT4": {
+          "water_per_cycle": 104.5898,
+          "water_per_month": 34.863266666666666,
+          "organic_fertilizer_per_cycle": 33.74512,
+          "organic_fertilizer_per_month": 11.248373333333334
+        }
+      }
+    },
+    {
+      "name": "Poppy",
+      "wiki_title": "Poppy",
+      "wiki_url": "https://wiki.coigame.com/Poppy",
+      "kind": "non-food",
+      "type": "Crafted material",
+      "state": "Loose",
+      "created_in": ["Greenhouse", "Greenhouse II"],
+      "used_in": [],
+      "duration_days": 240,
+      "base_output_per_cycle_tier_i": 31,
+      "base_output_per_cycle_tier_ii": 38,
+      "tiers": {
+        "FarmT2": {
+          "water_per_cycle": null,
+          "water_per_month": null,
+          "organic_fertilizer_per_cycle": null,
+          "organic_fertilizer_per_month": null
+        },
+        "FarmT3": {
+          "water_per_cycle": 121.5234,
+          "water_per_month": 30.38085,
+          "organic_fertilizer_per_cycle": 40.49316,
+          "organic_fertilizer_per_month": 10.12329
+        },
+        "FarmT4": {
+          "water_per_cycle": 135.1172,
+          "water_per_month": 33.7793,
+          "organic_fertilizer_per_cycle": 44.99316,
+          "organic_fertilizer_per_month": 11.24829
+        }
+      }
+    }
+  ]
+}

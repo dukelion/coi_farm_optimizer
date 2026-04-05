@@ -1,0 +1,15 @@
+{
+  "building_counts": {
+    "FarmT2": 2
+  },
+  "foods": [
+    "Vegetables",
+    "Tofu"
+  ],
+  "food_multiplier": 1.0,
+  "extra_requirements": {},
+  "fertilizer": "Organic Fert",
+  "baseline_fertility_by_building": {
+    "FarmT2": 100.0
+  }
+}

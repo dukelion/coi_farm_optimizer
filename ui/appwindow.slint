@@ -1,0 +1,500 @@
+import { Button, CheckBox, ComboBox, GroupBox, HorizontalBox, LineEdit, ScrollView, Slider, SpinBox, TextEdit, VerticalBox } from "std-widgets.slint";
+
+export component AppWindow inherits Window {
+    width: 1200px;
+    height: 820px;
+    title: "CoI Rust Scenario Solver";
+    background: #eef2f6;
+
+    in-out property <int> farm-t1-count: 0;
+    in-out property <int> farm-t2-count: 2;
+    in-out property <int> farm-t3-count: 0;
+    in-out property <int> farm-t4-count: 0;
+
+    in-out property <bool> food-potatoes: false;
+    in-out property <bool> food-corn: false;
+    in-out property <bool> food-bread: false;
+    in-out property <bool> food-vegetables: true;
+    in-out property <bool> food-tofu: true;
+    in-out property <bool> food-meat: false;
+    in-out property <bool> food-eggs: false;
+    in-out property <bool> food-sausage: false;
+    in-out property <bool> food-fruit: false;
+    in-out property <bool> food-snack: false;
+    in-out property <bool> food-cake: false;
+
+    in-out property <string> fertilizer-selection: "Organic Fert";
+    in-out property <string> baseline-farm-t1: "Natural";
+    in-out property <string> baseline-farm-t2: "100";
+    in-out property <string> baseline-farm-t3: "Natural";
+    in-out property <string> baseline-farm-t4: "Natural";
+    in-out property <string> food-multiplier-text: "1.0";
+    in-out property <string> extra-requirements-json: "{}";
+    in-out property <string> extra-target-selection: "Saplings";
+    in-out property <bool> extra-target-1-visible: false;
+    in-out property <bool> extra-target-2-visible: false;
+    in-out property <bool> extra-target-3-visible: false;
+    in-out property <bool> extra-target-4-visible: false;
+    in-out property <string> extra-target-1-name: "";
+    in-out property <string> extra-target-2-name: "";
+    in-out property <string> extra-target-3-name: "";
+    in-out property <string> extra-target-4-name: "";
+    in-out property <string> extra-target-1-value: "1";
+    in-out property <string> extra-target-2-value: "1";
+    in-out property <string> extra-target-3-value: "1";
+    in-out property <string> extra-target-4-value: "1";
+
+    in-out property <string> status-text: "Ready";
+    in-out property <string> report-text: "Run a scenario to see the report.";
+    in-out property <bool> solving: false;
+    in-out property <bool> baseline-editor-open: false;
+    in-out property <string> baseline-editor-building: "";
+    in-out property <int> baseline-editor-min: 70;
+    in-out property <int> baseline-editor-max: 100;
+    in-out property <float> baseline-editor-value: 100;
+    in-out property <bool> baseline-editor-natural: false;
+    in-out property <string> baseline-editor-display: "100%";
+    in-out property <length> baseline-editor-x: 0px;
+    in-out property <length> baseline-editor-y: 0px;
+
+    callback run-solver();
+    callback load-scenario();
+    callback save-scenario();
+    callback reset-scenario();
+    callback open-baseline-editor(string, length, length, length);
+    callback cancel-baseline-editor();
+    callback apply-baseline-editor();
+    callback preview-baseline-editor-value(float);
+    callback add-extra-target();
+    callback remove-extra-target(int);
+
+    VerticalBox {
+        padding: 16px;
+        spacing: 12px;
+
+        Rectangle {
+            min-height: 42px;
+            border-width: 1px;
+            border-radius: 8px;
+            border-color: #d8e1e8;
+            background: #f8fbfd;
+
+            HorizontalBox {
+                padding: 8px;
+                spacing: 8px;
+
+                Text {
+                    text: "File";
+                    color: #506070;
+                    vertical-alignment: center;
+                }
+                Button {
+                    text: "Load";
+                    enabled: !root.solving;
+                    clicked => { root.load-scenario(); }
+                }
+                Button {
+                    text: "Save";
+                    enabled: !root.solving;
+                    clicked => { root.save-scenario(); }
+                }
+                Button {
+                    text: "Reset";
+                    enabled: !root.solving;
+                    clicked => { root.reset-scenario(); }
+                }
+                Rectangle { horizontal-stretch: 1; }
+                Text {
+                    text: "Configure inputs on the left, then review the generated report on the right.";
+                    color: #506070;
+                    vertical-alignment: center;
+                }
+            }
+        }
+
+        HorizontalBox {
+            spacing: 16px;
+            vertical-stretch: 1;
+
+            GroupBox {
+                title: "Inputs";
+                min-width: 440px;
+                preferred-width: 460px;
+                vertical-stretch: 1;
+
+                ScrollView {
+                    horizontal-stretch: 1;
+                    vertical-stretch: 1;
+
+                    VerticalBox {
+                        padding: 10px;
+                        spacing: 12px;
+
+                        GroupBox {
+                            title: "Buildings";
+                            VerticalBox {
+                                spacing: 8px;
+
+                                HorizontalBox {
+                                    spacing: 10px;
+                                    Text { text: "Farm T1"; min-width: 72px; vertical-alignment: center; }
+                                    SpinBox { value <=> root.farm-t1-count; minimum: 0; maximum: 200; min-width: 90px; }
+                                    Rectangle { horizontal-stretch: 1; }
+                                    Text { text: "Baseline"; min-width: 54px; vertical-alignment: center; color: #5d6d7e; }
+                                    Button {
+                                        min-width: 110px;
+                                        text: root.baseline-farm-t1 == "Natural" ? "Natural" : root.baseline-farm-t1 + "%";
+                                        clicked => { root.open-baseline-editor("FarmT1", self.absolute-position.x, self.absolute-position.y, self.height); }
+                                    }
+                                }
+                                HorizontalBox {
+                                    spacing: 10px;
+                                    Text { text: "Farm T2"; min-width: 72px; vertical-alignment: center; }
+                                    SpinBox { value <=> root.farm-t2-count; minimum: 0; maximum: 200; min-width: 90px; }
+                                    Rectangle { horizontal-stretch: 1; }
+                                    Text { text: "Baseline"; min-width: 54px; vertical-alignment: center; color: #5d6d7e; }
+                                    Button {
+                                        min-width: 110px;
+                                        text: root.baseline-farm-t2 == "Natural" ? "Natural" : root.baseline-farm-t2 + "%";
+                                        clicked => { root.open-baseline-editor("FarmT2", self.absolute-position.x, self.absolute-position.y, self.height); }
+                                    }
+                                }
+                                HorizontalBox {
+                                    spacing: 10px;
+                                    Text { text: "Farm T3"; min-width: 72px; vertical-alignment: center; }
+                                    SpinBox { value <=> root.farm-t3-count; minimum: 0; maximum: 200; min-width: 90px; }
+                                    Rectangle { horizontal-stretch: 1; }
+                                    Text { text: "Baseline"; min-width: 54px; vertical-alignment: center; color: #5d6d7e; }
+                                    Button {
+                                        min-width: 110px;
+                                        text: root.baseline-farm-t3 == "Natural" ? "Natural" : root.baseline-farm-t3 + "%";
+                                        clicked => { root.open-baseline-editor("FarmT3", self.absolute-position.x, self.absolute-position.y, self.height); }
+                                    }
+                                }
+                                HorizontalBox {
+                                    spacing: 10px;
+                                    Text { text: "Farm T4"; min-width: 72px; vertical-alignment: center; }
+                                    SpinBox { value <=> root.farm-t4-count; minimum: 0; maximum: 200; min-width: 90px; }
+                                    Rectangle { horizontal-stretch: 1; }
+                                    Text { text: "Baseline"; min-width: 54px; vertical-alignment: center; color: #5d6d7e; }
+                                    Button {
+                                        min-width: 110px;
+                                        text: root.baseline-farm-t4 == "Natural" ? "Natural" : root.baseline-farm-t4 + "%";
+                                        clicked => { root.open-baseline-editor("FarmT4", self.absolute-position.x, self.absolute-position.y, self.height); }
+                                    }
+                                }
+                            }
+                        }
+
+                        GroupBox {
+                            title: "Foods";
+                            VerticalBox {
+                                spacing: 10px;
+
+                                HorizontalBox {
+                                    spacing: 10px;
+                                    VerticalBox {
+                                        spacing: 4px;
+                                        min-width: 150px;
+                                        Text { text: "Carbs"; color: #425466; }
+                                        CheckBox { text: "Potatoes"; checked <=> root.food-potatoes; }
+                                        CheckBox { text: "Corn"; checked <=> root.food-corn; }
+                                        CheckBox { text: "Bread"; checked <=> root.food-bread; }
+                                    }
+                                    VerticalBox {
+                                        spacing: 4px;
+                                        min-width: 150px;
+                                        Text { text: "Protein"; color: #425466; }
+                                        CheckBox { text: "Tofu"; checked <=> root.food-tofu; }
+                                        CheckBox { text: "Meat"; checked <=> root.food-meat; }
+                                        CheckBox { text: "Eggs"; checked <=> root.food-eggs; }
+                                        CheckBox { text: "Sausage"; checked <=> root.food-sausage; }
+                                    }
+                                }
+
+                                HorizontalBox {
+                                    spacing: 10px;
+                                    VerticalBox {
+                                        spacing: 4px;
+                                        min-width: 150px;
+                                        Text { text: "Vitamins"; color: #425466; }
+                                        CheckBox { text: "Vegetables"; checked <=> root.food-vegetables; }
+                                        CheckBox { text: "Fruit"; checked <=> root.food-fruit; }
+                                    }
+                                    VerticalBox {
+                                        spacing: 4px;
+                                        min-width: 150px;
+                                        Text { text: "Treats"; color: #425466; }
+                                        CheckBox { text: "Snack"; checked <=> root.food-snack; }
+                                        CheckBox { text: "Cake"; checked <=> root.food-cake; }
+                                    }
+                                }
+                            }
+                        }
+
+                        GroupBox {
+                            title: "Solver Settings";
+                            VerticalBox {
+                                spacing: 8px;
+
+                                HorizontalBox {
+                                    spacing: 10px;
+                                    Text { text: "Fertilizer"; min-width: 100px; vertical-alignment: center; }
+                                    ComboBox {
+                                        model: ["None", "Organic Fert", "Fertilizer I", "Fertilizer II"];
+                                        current-value <=> root.fertilizer-selection;
+                                        horizontal-stretch: 1;
+                                    }
+                                }
+
+                                HorizontalBox {
+                                    spacing: 10px;
+                                    Text { text: "Food Multiplier"; min-width: 100px; vertical-alignment: center; }
+                                    LineEdit {
+                                        text <=> root.food-multiplier-text;
+                                        horizontal-stretch: 1;
+                                    }
+                                }
+                            }
+                        }
+
+                        GroupBox {
+                            title: "Advanced";
+                            VerticalBox {
+                                spacing: 8px;
+                                Text {
+                                    text: "Add optional solver targets like Saplings, Cooking Oil, Sugar, Ethanol, Poppy, or Food Pack.";
+                                    wrap: word-wrap;
+                                    color: #5d6d7e;
+                                }
+
+                                HorizontalBox {
+                                    spacing: 8px;
+                                    ComboBox {
+                                        model: ["Saplings", "Cooking Oil", "Sugar", "Ethanol", "Poppy", "Food Pack"];
+                                        current-value <=> root.extra-target-selection;
+                                        horizontal-stretch: 1;
+                                    }
+                                    Button {
+                                        text: "+";
+                                        clicked => { root.add-extra-target(); }
+                                    }
+                                }
+
+                                if root.extra-target-1-visible : HorizontalBox {
+                                    spacing: 8px;
+                                    Text {
+                                        text: root.extra-target-1-name;
+                                        min-width: 90px;
+                                        vertical-alignment: center;
+                                    }
+                                    LineEdit {
+                                        text <=> root.extra-target-1-value;
+                                        horizontal-stretch: 1;
+                                    }
+                                    Button {
+                                        text: "Remove";
+                                        clicked => { root.remove-extra-target(1); }
+                                    }
+                                }
+
+                                if root.extra-target-2-visible : HorizontalBox {
+                                    spacing: 8px;
+                                    Text {
+                                        text: root.extra-target-2-name;
+                                        min-width: 90px;
+                                        vertical-alignment: center;
+                                    }
+                                    LineEdit {
+                                        text <=> root.extra-target-2-value;
+                                        horizontal-stretch: 1;
+                                    }
+                                    Button {
+                                        text: "Remove";
+                                        clicked => { root.remove-extra-target(2); }
+                                    }
+                                }
+
+                                if root.extra-target-3-visible : HorizontalBox {
+                                    spacing: 8px;
+                                    Text {
+                                        text: root.extra-target-3-name;
+                                        min-width: 90px;
+                                        vertical-alignment: center;
+                                    }
+                                    LineEdit {
+                                        text <=> root.extra-target-3-value;
+                                        horizontal-stretch: 1;
+                                    }
+                                    Button {
+                                        text: "Remove";
+                                        clicked => { root.remove-extra-target(3); }
+                                    }
+                                }
+
+                                if root.extra-target-4-visible : HorizontalBox {
+                                    spacing: 8px;
+                                    Text {
+                                        text: root.extra-target-4-name;
+                                        min-width: 90px;
+                                        vertical-alignment: center;
+                                    }
+                                    LineEdit {
+                                        text <=> root.extra-target-4-value;
+                                        horizontal-stretch: 1;
+                                    }
+                                    Button {
+                                        text: "Remove";
+                                        clicked => { root.remove-extra-target(4); }
+                                    }
+                                }
+
+                                if !root.extra-target-1-visible && !root.extra-target-2-visible && !root.extra-target-3-visible && !root.extra-target-4-visible : Text {
+                                    text: "No extra targets added.";
+                                    color: #7b8a99;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            GroupBox {
+                title: "Report";
+                horizontal-stretch: 1;
+                vertical-stretch: 1;
+
+                VerticalBox {
+                    spacing: 8px;
+                    Text {
+                        text: "Solver output, validation errors, and progress details appear here.";
+                        wrap: word-wrap;
+                        color: #506070;
+                    }
+                    TextEdit {
+                        text <=> root.report-text;
+                        read-only: true;
+                        wrap: word-wrap;
+                        horizontal-stretch: 1;
+                        vertical-stretch: 1;
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            min-height: 44px;
+            border-width: 1px;
+            border-radius: 8px;
+            border-color: #d8e1e8;
+            background: #f8fbfd;
+
+            HorizontalBox {
+                padding: 8px;
+                spacing: 10px;
+
+                Button {
+                    text: root.solving ? "Stop Solve" : "Run Solve";
+                    clicked => { root.run-solver(); }
+                }
+                Text {
+                    text: root.status-text;
+                    wrap: word-wrap;
+                    vertical-alignment: center;
+                    horizontal-stretch: 1;
+                    color: #506070;
+                }
+            }
+        }
+    }
+
+    if root.baseline-editor-open : Rectangle {
+        x: 0px;
+        y: 0px;
+        width: parent.width;
+        height: parent.height;
+        background: #00000000;
+
+        TouchArea {
+            clicked => { root.apply-baseline-editor(); }
+        }
+
+        Rectangle {
+            width: 224px;
+            height: 78px;
+            x: root.baseline-editor-x;
+            y: root.baseline-editor-y;
+            border-width: 1px;
+            border-radius: 12px;
+            border-color: #c9d4de;
+            background: #fbfdff;
+
+            Rectangle {
+                width: 26px;
+                height: 5px;
+                x: 16px;
+                y: -1px;
+                border-radius: 2px;
+                background: #d7e2eb;
+            }
+
+            VerticalBox {
+                padding: 6px;
+                spacing: 2px;
+
+                HorizontalBox {
+                    spacing: 5px;
+
+                    Text {
+                        text: root.baseline-editor-building;
+                        color: #506070;
+                        vertical-alignment: center;
+                    }
+
+                    Rectangle { horizontal-stretch: 1; }
+
+                    Rectangle {
+                        width: 48px;
+                        height: 20px;
+                        border-width: 1px;
+                        border-radius: 10px;
+                        border-color: #d6dee6;
+                        background: #ffffff;
+
+                        Text {
+                            text: root.baseline-editor-display;
+                            x: (parent.width - self.width) / 2;
+                            y: (parent.height - self.height) / 2;
+                            font-size: 12px;
+                        }
+                    }
+                }
+
+                HorizontalBox {
+                    spacing: 5px;
+
+                    Text {
+                        text: "Off";
+                        color: #5d6d7e;
+                        vertical-alignment: center;
+                    }
+
+                    Slider {
+                        horizontal-stretch: 1;
+                        minimum: 0;
+                        maximum: root.baseline-editor-max - root.baseline-editor-min + 10;
+                        step: 10;
+                        value <=> root.baseline-editor-value;
+                        changed(value) => { root.preview-baseline-editor-value(value); }
+                    }
+
+                    Text {
+                        text: root.baseline-editor-max + "%";
+                        color: #5d6d7e;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+        }
+    }
+}
