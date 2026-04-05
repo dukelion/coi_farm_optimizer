@@ -1,0 +1,57 @@
+name: Windows Build and Release
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows-build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run tests
+        run: cargo test
+
+      - name: Build release GUI binary
+        run: cargo build --release --bin coi_farm_optimizer
+
+      - name: Prepare release bundle
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item target/release/coi_farm_optimizer.exe dist/coi_farm_optimizer.exe
+          Copy-Item README.md dist/README.md
+          Copy-Item LICENSE-APACHE dist/LICENSE-APACHE
+          Copy-Item LICENSE-MIT dist/LICENSE-MIT
+          Compress-Archive -Path dist/* -DestinationPath coi_farm_optimizer-windows-x86_64.zip -Force
+
+      - name: Upload CI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coi_farm_optimizer-windows-x86_64
+          path: coi_farm_optimizer-windows-x86_64.zip
+
+      - name: Attach asset to GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: coi_farm_optimizer-windows-x86_64.zip

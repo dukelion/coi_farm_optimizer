@@ -8,6 +8,10 @@ readme = "README.md"
 keywords = ["captain-of-industry", "optimization", "rust", "slint"]
 categories = ["science", "simulation"]
 
+[[bin]]
+name = "coi_farm_optimizer"
+path = "src/main.rs"
+
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

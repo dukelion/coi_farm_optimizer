@@ -50,7 +50,7 @@ Notes:
 Desktop UI:
 
 ```powershell
-cargo run
+cargo run --bin coi_farm_optimizer
 ```
 
 CLI report for a scenario file:
@@ -70,6 +70,13 @@ cargo run --bin compare_stages -- last_scenario.json
 ```powershell
 cargo test
 ```
+
+## Releases
+
+GitHub Actions builds a Windows release binary for `coi_farm_optimizer`.
+
+- every PR and push to `master` uploads a downloadable CI artifact
+- pushing a tag like `v0.1.0` also attaches `coi_farm_optimizer-windows-x86_64.zip` to the corresponding GitHub Release
 
 ## Contributing
 
