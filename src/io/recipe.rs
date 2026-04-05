@@ -266,6 +266,7 @@ impl AuthoritativeRecipeData {
         let bread_recipe = self.recipe("BreadProduction")?;
         let eggs_pack_recipe = self.recipe("FoodPackAssemblyEggsT2")?;
         let meat_pack_recipe = self.recipe("FoodPackAssemblyMeatT2")?;
+        let meat_processing = self.recipe("MeatProcessing")?;
         let chicken_farm = self.recipe("ChickenFarm")?;
         let sugar_to_ethanol = self.recipe("SugarToEthanolFermentation")?;
         let corn_to_ethanol = self.recipe("CornToEthanolFermentation")?;
@@ -284,6 +285,7 @@ impl AuthoritativeRecipeData {
 
         let mut eggs_packs = Vec::new();
         let mut meat_packs = Vec::new();
+        let mut balanced_chicken_packs = Vec::new();
 
         for (crop_name, feed_recipe_id) in feed_recipe_ids {
             let animal_feed_output = self.recipe(feed_recipe_id)?.outputs["Animal Feed"];
@@ -354,6 +356,48 @@ impl AuthoritativeRecipeData {
             meat_pack.chicken_eggs_produced = meat_process_scale * chicken_farm.outputs["Eggs"];
             meat_pack.chicken_carcasses_produced = meat_process_scale * chicken_farm.outputs["Chicken Carcass"];
             meat_packs.push(meat_pack);
+
+            let egg_pack_runs_from_one_chicken =
+                chicken_farm.outputs["Eggs"] / eggs_pack_recipe.inputs["Eggs"];
+            let meat_processing_runs_from_one_chicken =
+                chicken_farm.outputs["Chicken Carcass"] / meat_processing.inputs["Chicken Carcass"];
+            let meat_pack_runs_from_one_chicken =
+                meat_processing_runs_from_one_chicken * meat_processing.outputs["Meat"]
+                    / meat_pack_recipe.inputs["Meat"];
+            let total_food_pack_output_from_one_chicken = egg_pack_runs_from_one_chicken
+                * eggs_pack_recipe.outputs["Food Pack"]
+                + meat_pack_runs_from_one_chicken * meat_pack_recipe.outputs["Food Pack"];
+            let chicken_scale = 1.0 / total_food_pack_output_from_one_chicken;
+            let bread_runs = (egg_pack_runs_from_one_chicken * eggs_pack_recipe.inputs["Bread"]
+                + meat_pack_runs_from_one_chicken * meat_pack_recipe.inputs["Bread"])
+                * chicken_scale
+                / bread_recipe.outputs["Bread"];
+            let wheat_runs =
+                bread_runs * bread_recipe.inputs["Flour"] / wheat_milling.outputs["Flour"];
+            let eggs_pack_runs = egg_pack_runs_from_one_chicken * chicken_scale;
+            let meat_processing_runs = meat_processing_runs_from_one_chicken * chicken_scale;
+            let meat_pack_runs = meat_pack_runs_from_one_chicken * chicken_scale;
+            let feed_runs = chicken_scale * chicken_farm.inputs["Animal Feed"] / animal_feed_output;
+            let mut balanced_pack = self.combine_steps(
+                &format!("Balanced Food Pack ({crop_name})"),
+                &[
+                    ("WheatMilling", wheat_runs),
+                    ("BreadProduction", bread_runs),
+                    (feed_recipe_id, feed_runs),
+                    ("ChickenFarm", chicken_scale),
+                    ("MeatProcessing", meat_processing_runs),
+                    ("FoodPackAssemblyEggsT2", eggs_pack_runs),
+                    ("FoodPackAssemblyMeatT2", meat_pack_runs),
+                ],
+            )?;
+            balanced_pack.primary_output = Some("Food Pack".to_owned());
+            balanced_pack.animal_feed_source = Some(crop_name.to_owned());
+            balanced_pack.animal_feed_used = chicken_scale * chicken_farm.inputs["Animal Feed"];
+            balanced_pack.chicken_farm_runs = chicken_scale;
+            balanced_pack.chicken_eggs_produced = chicken_scale * chicken_farm.outputs["Eggs"];
+            balanced_pack.chicken_carcasses_produced =
+                chicken_scale * chicken_farm.outputs["Chicken Carcass"];
+            balanced_chicken_packs.push(balanced_pack);
         }
 
         let cooking_oil_variants = dedupe_variants(vec![
@@ -422,6 +466,7 @@ impl AuthoritativeRecipeData {
                     let mut variants = vec![tofu_pack];
                     variants.extend(eggs_packs);
                     variants.extend(meat_packs);
+                    variants.extend(balanced_chicken_packs);
                     variants
                 }),
             ),
@@ -753,7 +798,7 @@ mod tests {
             .map(|variant| variant.name.as_str())
             .collect::<BTreeSet<_>>();
 
-        assert_eq!(food_pack_variants.len(), 9);
+        assert_eq!(food_pack_variants.len(), 13);
         assert_eq!(
             names,
             BTreeSet::from([
@@ -766,6 +811,10 @@ mod tests {
                 "Meat Pack (Wheat)",
                 "Meat Pack (Corn)",
                 "Meat Pack (Soybean)",
+                "Balanced Food Pack (Potatoes)",
+                "Balanced Food Pack (Wheat)",
+                "Balanced Food Pack (Corn)",
+                "Balanced Food Pack (Soybean)",
             ])
         );
     }
@@ -831,6 +880,23 @@ mod tests {
         assert!((eggs_pack.outputs["Food Pack"] - 1.0).abs() < 1e-9);
         assert!(eggs_pack.outputs["Chicken Carcass"] > 1.0);
         assert!((eggs_pack.outputs["Animal Feed"] - 0.125).abs() < 1e-9);
+    }
+
+    #[test]
+    fn balanced_food_pack_consumes_carcasses_internally() {
+        let data = AuthoritativeRecipeData::load(&source_path()).expect("recipe data should load");
+        let variants = data
+            .build_requirement_variants()
+            .expect("variants should build");
+        let balanced_pack = variants["Food Pack"]
+            .iter()
+            .find(|variant| variant.name == "Balanced Food Pack (Corn)")
+            .expect("balanced corn food pack should exist");
+
+        assert!((balanced_pack.outputs["Food Pack"] - 1.0).abs() < 1e-9);
+        assert!(balanced_pack.outputs.get("Chicken Carcass").copied().unwrap_or(0.0).abs() < 1e-9);
+        assert!(balanced_pack.inputs.contains_key("Corn"));
+        assert!(balanced_pack.inputs.contains_key("Wheat"));
     }
 
     #[test]

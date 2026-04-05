@@ -1,4 +1,5 @@
 use std::collections::BTreeSet;
+use std::collections::BTreeMap;
 use std::env;
 use std::path::Path;
 
@@ -49,15 +50,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn print_runs(runs: &std::collections::BTreeMap<String, f64>) {
-    if runs.is_empty() {
+    let display_runs = summarize_runs_for_display(runs);
+
+    if display_runs.is_empty() {
         println!("  (none)");
         return;
     }
 
-    for (name, amount) in runs {
-        if *amount > 1e-9 {
-            println!("  {name}: {amount:.4} runs/month");
-        }
+    for (name, amount) in display_runs {
+        println!("  {name}: {amount:.4} runs/month");
     }
 }
 
@@ -65,6 +66,8 @@ fn print_diff(
     phase1: &std::collections::BTreeMap<String, f64>,
     phase2: &std::collections::BTreeMap<String, f64>,
 ) {
+    let phase1 = summarize_runs_for_display(phase1);
+    let phase2 = summarize_runs_for_display(phase2);
     let keys = phase1
         .keys()
         .chain(phase2.keys())
@@ -83,5 +86,77 @@ fn print_diff(
 
     if !changed {
         println!("  (no changes)");
+    }
+}
+
+fn summarize_runs_for_display(runs: &BTreeMap<String, f64>) -> BTreeMap<String, f64> {
+    const BALANCED_FOOD_PACK_EGG_SHARE: f64 = 0.594456940152;
+    const BALANCED_FOOD_PACK_MEAT_SHARE: f64 = 0.405543059848;
+
+    let mut display_runs = BTreeMap::new();
+
+    for (name, amount) in runs {
+        if *amount <= 1e-9 {
+            continue;
+        }
+
+        if name.starts_with("Eggs Pack (") {
+            *display_runs
+                .entry("Food Pack (egg-based)".to_owned())
+                .or_insert(0.0) += amount;
+            continue;
+        }
+
+        if name.starts_with("Meat Pack (") {
+            *display_runs
+                .entry("Food Pack (meat-based)".to_owned())
+                .or_insert(0.0) += amount;
+            continue;
+        }
+
+        if name == "Tofu Pack" {
+            *display_runs
+                .entry("Food Pack (tofu-based)".to_owned())
+                .or_insert(0.0) += amount;
+            continue;
+        }
+
+        if name.starts_with("Balanced Food Pack (") {
+            *display_runs
+                .entry("Food Pack (egg-based)".to_owned())
+                .or_insert(0.0) += amount * BALANCED_FOOD_PACK_EGG_SHARE;
+            *display_runs
+                .entry("Food Pack (meat-based)".to_owned())
+                .or_insert(0.0) += amount * BALANCED_FOOD_PACK_MEAT_SHARE;
+            continue;
+        }
+
+        *display_runs.entry(name.clone()).or_insert(0.0) += amount;
+    }
+
+    display_runs
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::BTreeMap;
+
+    use super::summarize_runs_for_display;
+
+    #[test]
+    fn display_summary_hides_balanced_food_pack_internal_name() {
+        let runs = BTreeMap::from([
+            ("Balanced Food Pack (Corn)".to_owned(), 10.0),
+            ("Eggs Pack (Wheat)".to_owned(), 1.0),
+            ("Meat Pack (Corn)".to_owned(), 2.0),
+            ("Tofu Pack".to_owned(), 0.5),
+        ]);
+
+        let display = summarize_runs_for_display(&runs);
+
+        assert!(!display.keys().any(|name| name.starts_with("Balanced Food Pack (")));
+        assert_eq!(display["Food Pack (tofu-based)"], 0.5);
+        assert!((display["Food Pack (egg-based)"] - 6.94456940152).abs() < 1e-9);
+        assert!((display["Food Pack (meat-based)"] - 6.05543059848).abs() < 1e-9);
     }
 }

@@ -167,6 +167,12 @@ Shared allocation-problem preparation is factored through:
 
 - `src/domain/allocation_problem.rs`
 
+## Food Pack Chicken Reuse
+
+For `Food Pack` requirements, chicken-backed variants may use both eggs and carcasses from the same chicken-farm runs.
+
+This is intended to let allocation reduce total chickens/feed when carcass recovery into meat packs is beneficial, instead of modeling egg-pack and meat-pack chains as fully separate chicken demand.
+
 
 ## Progress and Cancellation
 
@@ -235,7 +241,10 @@ The report formatter is in:
 Solver-related report rules:
 
 - `Supported Population` is the final stabilized allocation population
-- `Recipe Chains Used` are the final stage-2 process chains
+- `Recipe Chains Used` are the final stage-2 processing chains after report-level presentation cleanup
+- direct-consumption variants such as `Direct Potatoes` are not shown in `Recipe Chains Used`
+- `Food Pack` variants are summarized into three report lines: egg-based, meat-based, and tofu-based
+- slack sink conversions such as `Slack Corn -> Animal Feed` are shown in a separate `Surplus Conversions` section
 - `Bottleneck Food` must use the same demand semantics as the solver
 - `Bottleneck Crop` is currently the crop with the highest used/available ratio
 

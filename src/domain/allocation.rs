@@ -613,4 +613,37 @@ mod tests {
         assert_eq!(result.extra_outputs.get("Sugar").copied().unwrap_or(0.0), 0.0);
         assert_eq!(result.extra_outputs.get("Ethanol").copied().unwrap_or(0.0), 0.0);
     }
+
+    #[test]
+    fn food_pack_requirements_can_use_both_eggs_and_carcasses_from_same_chickens() {
+        let data = recipe_data();
+        let food_variants = data.build_food_variants().expect("food variants should build");
+        let recipe_variants = data
+            .build_requirement_variants()
+            .expect("requirement variants should build");
+        let slack_variants = data
+            .build_slack_sink_variants()
+            .expect("slack variants should build");
+
+        let result = evaluate_population_from_crop_outputs(
+            &BTreeMap::from([
+                ("Corn".to_owned(), 80.0),
+                ("Wheat".to_owned(), 40.0),
+            ]),
+            &["Corn"],
+            1.0,
+            &BTreeMap::from([("Food Pack".to_owned(), 10.0)]),
+            &food_variants,
+            &recipe_variants,
+            &slack_variants,
+        )
+        .expect("allocation should succeed");
+
+        assert!(result
+            .process_runs
+            .keys()
+            .any(|name| name.starts_with("Balanced Food Pack (")));
+        assert!(result.extra_outputs.get("Chicken Carcass").copied().unwrap_or(0.0) < 1e-6);
+        assert!(result.extra_outputs["Food Pack"] >= 10.0 - 1e-6);
+    }
 }
